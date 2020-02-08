@@ -57,9 +57,9 @@ public class LoginView implements View {
 	public View selectOption() {//if the method returns null, exit the app(lock them out); otherwise, return AccountView page
 		String[] unamePwd = new String[2];
 		System.out.println("\n Username:  ");
-		unamePwd[1] = InputUtil.getNextString();
+		unamePwd[0] = InputUtil.getNextString();
 		System.out.println("\n Password:  ");
-		unamePwd[2] = InputUtil.getNextString();
+		unamePwd[1] = InputUtil.getNextString();
 		
 		Account usrAcc = loginAuth(unamePwd);
 		
@@ -72,9 +72,18 @@ public class LoginView implements View {
 	}
 	
 	private Account loginAuth(String[] uname_pwd) {
-		Account usrAcc = new Account();
 		
-		return usrAcc;
+		//TODO start db auth and retrieval of data here
+		Account usrAcc = null;
+		if (uname_pwd[0].equals("cloud") && uname_pwd[1].equals("cloud123") ) {
+			usrAcc = new Account(1, uname_pwd[0], uname_pwd[1]);
+			return usrAcc;
+		}
+		else {
+			return usrAcc;
+		}
+
+
 	}
 	
 	
