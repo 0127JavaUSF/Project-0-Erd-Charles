@@ -1,6 +1,7 @@
 package com.charlesproject0.views;
 
 import com.charlesproject0.models.Account;
+import com.charlesproject0.views.UserOptions;
 import com.charlesproject0.utils.InputUtil;
 
 public class UserAccountView implements View {
@@ -81,7 +82,7 @@ public class UserAccountView implements View {
 		// Do something with their selection, custom to this class
 		switch(selection) {
 
-			case 1: return new BankAccountOptions(this.usrAcc);
+			case 1: return new UserOptions(this.usrAcc);
 			case 2: return new LoginView();
 			case 3: return null;
 			default: return null;
