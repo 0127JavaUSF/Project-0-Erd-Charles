@@ -18,7 +18,7 @@ public class LoginAndTransferTests {
 
     private LoginView loginView;
     private Account cloudAcc;
-    private View accView;
+
 	private String[] loginCredench = new String[2];
 
 	@BeforeClass
@@ -36,7 +36,7 @@ public class LoginAndTransferTests {
 		loginCredench[1] = "Cloud123";
 		loginView = new LoginView();
 		cloudAcc = new Account(1, "cloud", "cloud123");
-		accView = new UserAccountView();
+
 	}
 
 	@After
@@ -49,10 +49,10 @@ public class LoginAndTransferTests {
 //
 //	}
 	
-	@Test
-	public void testLoginUserAuth() {
-		assertEquals("Should return the id of 1 associated to the value of the user returned from db", cloudAcc.getId() , loginView.loginAuth(loginCredench).getId());
-
-	}
+//	@Test
+//	public void testLoginUserAuth() {
+//		assertEquals("Should return the id of 1 associated to the value of the user returned from db", cloudAcc.getId() , loginView.loginAuth(loginCredench).getId());
+//
+//	}
 
 }

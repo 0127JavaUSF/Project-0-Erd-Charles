@@ -1,12 +1,16 @@
 package com.charlesproject0.views;
 
 import com.charlesproject0.models.Account;
+import com.charlesproject0.utils.InputUtil;
 
 public class UserAccountView implements View {
 	Account usrAcc;
 	@Override
 	public void showMenu() {
-		System.out.println("Welcome: " + usrAcc.getAccountName());
+		System.out.println("Welcome " + usrAcc.getAccountName() + "!"
+				+ "\n Please select an account for transactions or create/delete a single/joint account with the options below.\n\n");
+		
+		if(usrAcc.getAccountName().contentEquals("Cloud")) {
 		System.out.println(
 "           HHHHH;HHHH;;;;H;H; \\     H                                 \r\n" + 
 "            HHHHH;HHHH;H;H;H;  ;    HHHHe,,           \r\n" + 
@@ -65,14 +69,37 @@ public class UserAccountView implements View {
 "                  H;H             H\r\n" + 
 "                  H;H\r\n" + 
 "                  HH\r\n" + 
-"                  H");
-
+"                  H\n\n\n");
+		System.out.println("Add/Delete an account");
+		}
 	}
 
 	@Override
 	public View selectOption() {
-		// TODO Auto-generated method stub
-		return null;
+		int selection = InputUtil.getIntInRange(1, 3);
+		// User selects something - should be reusable
+		// Do something with their selection, custom to this class
+		switch(selection) {
+
+			case 1: return new BankAccountOptions(this.usrAcc);
+			case 2: return new LoginView();
+			case 3: return null;
+			default: return null;
+		}
 	}
+	
+	
+	public UserAccountView(Account usrAcc) {
+		this.usrAcc = usrAcc;
+	}
+
+	public Account getUsrAcc() {
+		return usrAcc;
+	}
+
+	public void setUsrAcc(Account usrAcc) {
+		this.usrAcc = usrAcc;
+	}
+	
 
 }

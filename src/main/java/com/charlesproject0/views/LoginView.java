@@ -73,7 +73,7 @@ public class LoginView implements View {
 		
 		try{
 			if (!(usrAcc == null)) {
-				return new UserAccountView();
+				return new UserAccountView(usrAcc);
 			}
 			
 		}
@@ -88,22 +88,22 @@ public class LoginView implements View {
 		return null;
 	}
 	
-	public Account loginAuth(String[] uname_pwd) {
+	//switch to public during testing
+	private Account loginAuth(String[] uname_pwd) {
 		
 		//TODO start db auth and retrieval of data here
 		Account usrAcc = null;
 		ResultSet rs = null;
 		
 		try(Connection connection = ConnectionUtil.getConnection()){
-//			connection.setAutoCommit(false);
+
 			String sql = "select * from accounts where account_name = ? and password = ?";
 			PreparedStatement ps = connection.prepareStatement(sql);
 
 			
 			ps.setString(1, uname_pwd[0]);
 			ps.setString(2, uname_pwd[1]);
-//			String sqlOkay =  "select * from accounts where account_name = 'Cloud' and password = 'Cloud123' ";
-//			PreparedStatement ps = connection.prepareStatement(sqlOkay);
+
 			
 			rs = ps.executeQuery();
 			
