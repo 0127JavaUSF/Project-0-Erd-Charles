@@ -1,6 +1,13 @@
 package com.charlesproject0.views;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import com.charlesproject0.models.Account;
+import com.charlesproject0.utils.ConnectionUtil;
 import com.charlesproject0.utils.InputUtil;
 
 public class LoginView implements View {
@@ -63,25 +70,61 @@ public class LoginView implements View {
 		
 		Account usrAcc = loginAuth(unamePwd);
 		
-		if (!(usrAcc.equals(null))) {
-			return new UserAccountView();
+		
+		try{
+			if (!(usrAcc == null)) {
+				return new UserAccountView();
+			}
+			
 		}
+		catch(NullPointerException e) {
+
+				e.printStackTrace();
+			
+		}
+
 	
 
 		return null;
 	}
 	
-	private Account loginAuth(String[] uname_pwd) {
+	public Account loginAuth(String[] uname_pwd) {
 		
 		//TODO start db auth and retrieval of data here
 		Account usrAcc = null;
-		if (uname_pwd[0].equals("cloud") && uname_pwd[1].equals("cloud123") ) {
-			usrAcc = new Account(1, uname_pwd[0], uname_pwd[1]);
-			return usrAcc;
+		ResultSet rs = null;
+		
+		try(Connection connection = ConnectionUtil.getConnection()){
+//			connection.setAutoCommit(false);
+			String sql = "select * from accounts where account_name = ? and password = ?";
+			PreparedStatement ps = connection.prepareStatement(sql);
+
+			
+			ps.setString(1, uname_pwd[0]);
+			ps.setString(2, uname_pwd[1]);
+//			String sqlOkay =  "select * from accounts where account_name = 'Cloud' and password = 'Cloud123' ";
+//			PreparedStatement ps = connection.prepareStatement(sqlOkay);
+			
+			rs = ps.executeQuery();
+			
+			//Determinant on result set being returned
+			if (!(rs == null)) {//found it
+				
+				while(rs.next()) {//ensures first row only, which should happen regardless if constraints on db are enforced
+					usrAcc = new Account(rs.getInt("id"), rs.getString("account_name"), rs.getString("password"));
+				}
+			
+			}
+
+//			connection.commit();
 		}
-		else {
-			return usrAcc;
+		catch(SQLException e) {
+			e.printStackTrace();
+
 		}
+		return usrAcc;
+		
+
 
 
 	}

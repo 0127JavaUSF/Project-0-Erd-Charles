@@ -16,9 +16,10 @@ import com.charlesproject0.views.View;
 
 public class LoginAndTransferTests {
 
-    private View loginView;
+    private LoginView loginView;
     private Account cloudAcc;
     private View accView;
+	private String[] loginCredench = new String[2];
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -30,6 +31,9 @@ public class LoginAndTransferTests {
 
 	@Before
 	public void setUp() throws Exception {
+
+		loginCredench[0] = "Cloud";
+		loginCredench[1] = "Cloud123";
 		loginView = new LoginView();
 		cloudAcc = new Account(1, "cloud", "cloud123");
 		accView = new UserAccountView();
@@ -38,17 +42,17 @@ public class LoginAndTransferTests {
 	@After
 	public void tearDown() throws Exception {
 	}
-
-	@Test
-	public void testUserAccountView() {
-		assertEquals("Should return accountView if provided cloud, cloud123 un/pwd combo(placeholder for auth); otherwise, fail", accView.getClass() , loginView.selectOption().getClass());
-
-	}
-	
+//
 //	@Test
-//	public void testLoginUserAuth() {
-//		assertEquals("Should return the id of 1 associated to the value of the user returned from db", cloudAcc.getId() , loginView.selectOption());
+//	public void testUserAccountView() {
+//		assertEquals("Should return accountView if provided cloud, cloud123 un/pwd combo(placeholder for auth); otherwise, fail", accView.getClass() , loginView.selectOption().getClass());
 //
 //	}
+	
+	@Test
+	public void testLoginUserAuth() {
+		assertEquals("Should return the id of 1 associated to the value of the user returned from db", cloudAcc.getId() , loginView.loginAuth(loginCredench).getId());
+
+	}
 
 }
