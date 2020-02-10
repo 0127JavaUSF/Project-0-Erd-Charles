@@ -14,20 +14,20 @@ import com.charlesproject0.utils.VerifyingAccountsTableUtil;
 
 public class BankAccountTransactionView implements View {//provides options for selecting bank account and performing bank transfer/deposit/withdrawals
 	private ArrayList<BankAccount> bankAccounts;
-	private BankAccount chosenBankAcc;
+	private BankAccount currBankAcc;
 	private Account usrAcc;
 	
 	
 	
-	BankAccountTransactionView(ArrayList<BankAccount> bankAccounts, BankAccount chosenBankAcc, Account usrAcc){//transferred over all relevant data to performing bank transfer/dep/withdrawal
+	BankAccountTransactionView(ArrayList<BankAccount> bankAccounts, BankAccount currBankAcc, Account usrAcc){//transferred over all relevant data to performing bank transfer/dep/withdrawal
 		this.bankAccounts = bankAccounts;
-		this.chosenBankAcc = chosenBankAcc;
+		this.currBankAcc = currBankAcc;
 		this.usrAcc = usrAcc;
 		
 	}
 	@Override
 	public void showMenu() {
-		System.out.println("Choose from the transaction options below for account: " + this.chosenBankAcc.getBankAccountName());
+		System.out.println("Choose from the transaction options below for account: " + this.currBankAcc.getBankAccountName());
 		System.out.println("                ______________\r\n" + 
 				"    __,.,---'''''              '''''---..._\r\n" + 
 				" ,-'             .....:::''::.:            '`-.\r\n" + 
@@ -38,9 +38,8 @@ public class BankAccountTransactionView implements View {//provides options for 
 				"      ''`---.....______________.....---''");
 		System.out.println("1: Withdrawal");
 		System.out.println("2: Deposit");
-		System.out.println("3: Transfer from this account");
-		System.out.println("4: Transfer to this account");
-		System.out.println("5: Return to viewing bank accounts");
+		System.out.println("3: Transfer to/from this account");
+		System.out.println("4: Return to viewing bank accounts");
 	}
 
 	@Override
@@ -54,16 +53,29 @@ public class BankAccountTransactionView implements View {//provides options for 
 			return this;
 			case 2: deposit();
 			return this;
-			case 3: transferFrom();
-			return this;
-			case 4: transferTo();
+			case 3: transfer();
 			return this;
 			default: return new ViewBankAccounts(this.usrAcc);
 		}
 
 	}
-	private void transferTo() {
-		double transferAmount = InputUtil.getNextDouble();
+	private void transfer() {
+		boolean transferToThis;
+		System.out.println("Select from the following options:");
+		System.out.println("1.Transfer to this bank account from another bank account");
+		System.out.println("2.Transfer from this bank account to another bank account");
+		
+		
+		if (InputUtil.getIntInRange(1, 2) == 1) {
+			transferToThis = true;
+			
+		}
+		else {
+			transferToThis = false;
+		}
+		
+
+		double transferAmount = InputUtil.getNextDouble();//obtain input for transfer amount
 
 		BankAccount bankAccSelectedDest = VerifyingAccountsTableUtil.verifyBankInList(bankAccounts);//allows user to select account from list
 
@@ -73,36 +85,44 @@ public class BankAccountTransactionView implements View {//provides options for 
 			//Account1 update
 			String sql = "select gil_balance from bank_accounts where bank_account_name = (?)";
 			PreparedStatement ps = connection.prepareStatement(sql);
-			ps.setString(1, this.chosenBankAcc.getBankAccountName());		//refresh the bank instance in case changes were made(real world applicable)
-			double oldFromAccBalance;
+			ps.setString(1, this.currBankAcc.getBankAccountName());		//refresh the bank instance in case changes were made(real world applicable)
+			double oldFromAccBalance = 0;
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()) {
 				oldFromAccBalance = rs.getDouble("gil_balance");
 			}
 			String sql2 = "Update bank_accounts set(gil_balance=(?) where bank_account.id = (?))";
 			PreparedStatement ps2 = connection.prepareStatement(sql2);
-			
-			double newFromAccBalance = oldFromAccBalance;
-			ps2.setDouble(1, alterBalance(chosenBankAcc, accBalance));
-			ps2.setInt(2, chosenBankAcc.getBankAccountId());
+			double newFromAccBalance;
+			if (!(transferToThis)) {
+			newFromAccBalance = oldFromAccBalance - transferAmount;//subtract from this account
+			}
+			else {
+			newFromAccBalance = oldFromAccBalance
+			}
+			ps2.setDouble(1, newFromAccBalance);
+			ps2.setInt(2, this.currBankAcc.getBankAccountId());
 			ps2.executeUpdate(sql2);
 			
 			
 			
 			//Account2 update
-			String sql = "select gil_balance from bank_accounts where bank_account_name";
-			PreparedStatement ps = connection.prepareStatement(sql);
-			ps.setString(1, bankAccSelectedDest.getBankAccountName());		//refresh the bank instance in case changes were made(real world applicable)
-			double accBalance;
-			ResultSet rs = ps.executeQuery();
-			while(rs.next()) {
-				accBalance = rs.getDouble("gil_balance");
+			String sql3 = "select gil_balance from bank_accounts where bank_account_name";
+			PreparedStatement ps3 = connection.prepareStatement(sql3);
+			ps3.setString(1, bankAccSelectedDest.getBankAccountName());		//refresh the bank instance in case changes were made(real world applicable)
+			double oldToAccBalance = 0;
+			ResultSet rs2 = ps3.executeQuery(sql3);
+			while(rs2.next()) {
+				oldToAccBalance = rs.getDouble("gil_balance");
 			}
-			String sql2 = "Update bank_accounts set(gil_balance=(?) where bank_account.id = (?))";
-			PreparedStatement ps2 = connection.prepareStatement(sql2);
-			ps2.setDouble(1, alterBalance(bankAccSelectedDest, accBalance));
-			ps2.setInt(2, bankAccSelectedDest.getBankAccountId());
-			ps2.executeUpdate(sql2);
+			
+			double newToAccBalance = oldToAccBalance + transferAmount;//subtract from this account
+			
+			String sql4 = "Update bank_accounts set(gil_balance=(?) where bank_account.id = (?))";
+			PreparedStatement ps4 = connection.prepareStatement(sql4);
+			ps4.setDouble(1, newToAccBalance);
+			ps4.setInt(2, bankAccSelectedDest.getBankAccountId());
+			ps4.executeUpdate(sql4);
 			
 			
 
