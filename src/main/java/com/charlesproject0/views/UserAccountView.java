@@ -1,7 +1,7 @@
 package com.charlesproject0.views;
 
 import com.charlesproject0.models.Account;
-import com.charlesproject0.views.UserOptions;
+
 import com.charlesproject0.utils.InputUtil;
 
 public class UserAccountView implements View {
@@ -9,7 +9,7 @@ public class UserAccountView implements View {
 	@Override
 	public void showMenu() {
 		System.out.println("Welcome " + usrAcc.getAccountName() + "!"
-				+ "\n Please select an account for transactions or create/delete a single/joint account with the options below.\n\n");
+				+ "\n Please select an account for transactions or create/delete a single/joint account with the options below.");
 		
 		if(usrAcc.getAccountName().contentEquals("Cloud")) {
 		System.out.println(
@@ -71,29 +71,48 @@ public class UserAccountView implements View {
 "                  H;H\r\n" + 
 "                  HH\r\n" + 
 "                  H\n\n\n");
-		System.out.println("Add/Delete an account");
+
 		}
+		System.out.println("1: Create Bank Account(single/joint)");
+		System.out.println("2: View Bank Accounts");
+		System.out.println("3: Logout");
 	}
 
 	@Override
 	public View selectOption() {
-		int selection = InputUtil.getIntInRange(1, 3);
-		// User selects something - should be reusable
-		// Do something with their selection, custom to this class
-		switch(selection) {
+		
+			int selection = InputUtil.getIntInRange(1, 3);
+			// User selects something - should be reusable
+			// Do something with their selection, custom to this class
+			switch(selection) {
 
-			case 1: return new UserOptions(this.usrAcc);
-			case 2: return new LoginView();
-			case 3: return null;
-			default: return null;
-		}
+				case 1: return new CreateBankAccountView();
+				case 2: return new ViewBankAccounts(this.getUsrAcc());
+				case 3: return new MainMenu() ;
+				default: return new MainMenu();
+			}
+	}
+		
+		
+		
+
+	public void addBankAccount(String ... jointUsers) {
+			for (String user:jointUsers) {
+				System.out.println(user);
+			}
 	}
 	
-	
+	//Constructors
 	public UserAccountView(Account usrAcc) {
 		this.usrAcc = usrAcc;
 	}
+	
+	public UserAccountView() {
 
+	}
+	
+
+	//non-overriden methods
 	public Account getUsrAcc() {
 		return usrAcc;
 	}

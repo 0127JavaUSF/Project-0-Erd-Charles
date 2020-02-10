@@ -26,11 +26,11 @@ public class CreateBankAccountView implements View {
 			System.out.println("To be added");
 			
 		}
-		else if(usrChoice.equals(JointOrSingleEnum.JOINT)) {
-				Strings[] usrAccs = InputUtil.
-				
-				
-		}
+//		else if(usrChoice.equals(JointOrSingleEnum.JOINT)) {
+//				Strings[] usrAccs = InputUtil.
+//				
+//				
+//		}
 		else {
 			System.out.println();
 		}

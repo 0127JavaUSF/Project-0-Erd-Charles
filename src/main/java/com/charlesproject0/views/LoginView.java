@@ -84,8 +84,8 @@ public class LoginView implements View {
 		}
 
 	
-
-		return null;
+		System.out.println("Incorrect login info, redirecting to main menu");
+		return new MainMenu();
 	}
 	
 	//switch to public during testing

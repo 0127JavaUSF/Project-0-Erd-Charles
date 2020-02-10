@@ -1,40 +1,32 @@
 package com.charlesproject0.views;
 
 
-import com.charlesproject0.daos.AccountDao;
 import com.charlesproject0.models.Account;
 import com.charlesproject0.utils.InputUtil;
 
-public class CreateAccountView implements View {
+public class CreateAccountView implements View {//TODO finish account creation stuff
 
-	AccountDao accountDao = new AccountDao();
+
 	
 	@Override
 	public void showMenu() {
-		System.out.println("1. Load Account");
-		System.out.println("2. Create Account");
-		System.out.println("0. Back");
+		System.out.println("Let's begin creating an account with a series of questions regarding the type of account");
+		System.out.println(". Back");
 	}
 
 	@Override
 	public View selectOption() {
-		int selection = InputUtil.getIntInRange(0, 2);
-		switch (selection) {
-		case 1: loadAccount(); return this;
-		case 2: createAccount(); return this;
-		default:
-		case 0: return new MainMenu();
-		}
+		int selection = InputUtil.getIntInRange(1, 3);
+//		switch (selection) {
+//		case 1: return this;
+//		case 2: createAccount(); return this;
+//		default:
+//		case 3: return new MainMenu();
+//		}
+		return null;
 	}
 
-	private void loadAccount() {
-		System.out.println("Enter Account ID: ");
-		int id = InputUtil.getIntInRange(1, Integer.MAX_VALUE);
-		
-		Account account = accountDao.getAccount(id);
-				
-		System.out.println(account);
-	}
+
 	
 	private void createAccount() {
 		System.out.println("Please enter account name ");
@@ -44,7 +36,7 @@ public class CreateAccountView implements View {
 		String password = InputUtil.getNextString();
 		
 		Account account = new Account(0, accountName, password);
-		account = accountDao.createAccount(account);
+
 		System.out.println(account);
 		
 	}

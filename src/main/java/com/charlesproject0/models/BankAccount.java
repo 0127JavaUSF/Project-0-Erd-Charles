@@ -1,6 +1,6 @@
 package com.charlesproject0.models;
 
-import com.charlesproject0.utils.CheckingSavingsEnum;
+
 
 public class BankAccount {
 
@@ -33,7 +33,7 @@ public class BankAccount {
 		this.gilBalance = gilBalance;
 	}
 
-	public BankAccount(String bankAccountName, CheckingSavingsEnum accountType, double gilBalance) {
+	public BankAccount(String bankAccountName, String accountType, double gilBalance) {
 		super();
 		this.bankAccountName = bankAccountName;
 		this.gilBalance = gilBalance;
