@@ -9,7 +9,7 @@ import com.charlesproject0.utils.VerifyingAccountsTableUtil;
 
 public class ViewBankAccounts implements View {
 	private ArrayList<BankAccount> bankAccounts;
-	Account usrAcc;
+	private Account usrAcc;
 	
 	public ViewBankAccounts(Account usrAcc) {
 		this.usrAcc = usrAcc;
@@ -33,7 +33,7 @@ public class ViewBankAccounts implements View {
 	public View selectOption() {
 		try{
 			this.setBankAccounts(VerifyingAccountsTableUtil.returnBankAccounts(this.getUsrAcc()));
-			for (BankAccount bAcc: this.getBankAccounts()) {
+			for (BankAccount bAcc: this.bankAccounts) {
 				System.out.println(bAcc.getBankAccountName());
 			}
 			
@@ -41,23 +41,17 @@ public class ViewBankAccounts implements View {
 		catch(NullPointerException e) {
 			e.printStackTrace();//either the user has no bank accounts, or they failed to load
 		}
-		String choice;
-		boolean found = false;
+		BankAccount foundAcc = null;
 		if (!(this.getBankAccounts().isEmpty())) {
-			do {
-				choice = InputUtil.getNextString();
-				for(BankAccount bAcc: this.getBankAccounts()) {
-					if (choice.equals(bAcc.getBankAccountName())){
-						found = true;
-						break;
-					};
-				}
-			}
-			while (!(found));//while user doesn't select one of the listed accounts
+			foundAcc = VerifyingAccountsTableUtil.verifyBankInList(this.bankAccounts);
+			return new BankAccountTransactionView(this.bankAccounts, foundAcc, this.usrAcc);//TODO return BankAccountOptions
+		}
+		else {
+			return new MainMenu();
 		}
 		
 		
-		return null;//TODO return BankAccountOptions
+		
 	}
 	public ArrayList<BankAccount> getBankAccounts() {
 		return bankAccounts;
@@ -65,5 +59,6 @@ public class ViewBankAccounts implements View {
 	public void setBankAccounts(ArrayList<BankAccount> bankAccounts) {
 		this.bankAccounts = bankAccounts;
 	}
+
 
 }

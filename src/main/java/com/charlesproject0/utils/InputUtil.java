@@ -32,4 +32,17 @@ public class InputUtil {
 	public static String getNextString() {
 		return scanner.nextLine();
 	}
+	
+	public static double getNextDouble() {
+		double transferAmount = 0;
+
+			while(!scanner.hasNextDouble()) {
+				scanner.nextLine();
+
+			}
+
+		
+		return transferAmount;
+		
+	}
 }

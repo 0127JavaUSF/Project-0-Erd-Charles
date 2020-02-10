@@ -91,7 +91,6 @@ public class LoginView implements View {
 	//switch to public during testing
 	private Account loginAuth(String[] uname_pwd) {
 		
-		//TODO start db auth and retrieval of data here
 		Account usrAcc = null;
 		ResultSet rs = null;
 		
