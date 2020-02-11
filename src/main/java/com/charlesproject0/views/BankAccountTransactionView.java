@@ -10,7 +10,7 @@ import com.charlesproject0.models.Account;
 import com.charlesproject0.models.BankAccount;
 import com.charlesproject0.utils.ConnectionUtil;
 import com.charlesproject0.utils.InputUtil;
-import com.charlesproject0.utils.VerifyingAccountsTableUtil;
+import com.charlesproject0.utils.ModelsUtil;
 
 public class BankAccountTransactionView implements View {//provides options for selecting bank account and performing bank transfer/deposit/withdrawals
 	private ArrayList<BankAccount> bankAccounts;
@@ -60,12 +60,11 @@ public class BankAccountTransactionView implements View {//provides options for 
 
 	}
 	private void transfer() {
-		boolean transferToThis;
 		System.out.println("Select from the following options:");
 		System.out.println("1.Transfer to this bank account from another bank account");
-		System.out.println("2.Transfer from this bank account to another bank account");
+		System.out.println("2.Transfer from this bank account to another bank account\n");
 		
-		
+		boolean transferToThis;
 		if (InputUtil.getIntInRange(1, 2) == 1) {
 			transferToThis = true;
 			
@@ -76,56 +75,60 @@ public class BankAccountTransactionView implements View {//provides options for 
 		
 
 		double transferAmount = InputUtil.getNextDouble();//obtain input for transfer amount
-
-		BankAccount bankAccSelectedDest = VerifyingAccountsTableUtil.verifyBankInList(bankAccounts);//allows user to select account from list
-
+		BankAccount otherBankAcc = ModelsUtil.verifyBankInList(bankAccounts);//allows user to select account from list
+		
 		try(Connection connection = ConnectionUtil.getConnection()){
 
 			connection.setAutoCommit(false);//starts transaction
 			//Account1 update
-			String sql = "select gil_balance from bank_accounts where bank_account_name = (?)";
+			String sql = "select gil_balance from bank_accounts where id = ?";
 			PreparedStatement ps = connection.prepareStatement(sql);
-			ps.setString(1, this.currBankAcc.getBankAccountName());		//refresh the bank instance in case changes were made(real world applicable)
-			double oldFromAccBalance = 0;
+			ps.setInt(1, this.currBankAcc.getBankAccountId());		//refresh the bank instance in case changes were made(real world applicable)
 			ResultSet rs = ps.executeQuery();
+			double currBankAccBalance = 0;
 			while(rs.next()) {
-				oldFromAccBalance = rs.getDouble("gil_balance");
+				currBankAccBalance = rs.getDouble("gil_balance");
 			}
-			String sql2 = "Update bank_accounts set(gil_balance=(?) where bank_account.id = (?))";
+			String sql2 = "Update bank_accounts SET gil_balance = ?  where id = ? RETURNING *";
 			PreparedStatement ps2 = connection.prepareStatement(sql2);
-			double newFromAccBalance;
+			double newCurrAccBalance = 0;
 			if (!(transferToThis)) {
-			newFromAccBalance = oldFromAccBalance - transferAmount;//subtract from this account
+			newCurrAccBalance = currBankAccBalance - transferAmount;//subtract from this account
 			}
 			else {
-			newFromAccBalance = oldFromAccBalance
+			newCurrAccBalance = currBankAccBalance + transferAmount;
 			}
-			ps2.setDouble(1, newFromAccBalance);
+			ps2.setDouble(1, newCurrAccBalance);
 			ps2.setInt(2, this.currBankAcc.getBankAccountId());
-			ps2.executeUpdate(sql2);
+			ResultSet rs2 = ps2.executeQuery();
 			
 			
 			
 			//Account2 update
-			String sql3 = "select gil_balance from bank_accounts where bank_account_name";
+			String sql3 = "select gil_balance from bank_accounts where id = ?";
 			PreparedStatement ps3 = connection.prepareStatement(sql3);
-			ps3.setString(1, bankAccSelectedDest.getBankAccountName());		//refresh the bank instance in case changes were made(real world applicable)
-			double oldToAccBalance = 0;
-			ResultSet rs2 = ps3.executeQuery(sql3);
-			while(rs2.next()) {
-				oldToAccBalance = rs.getDouble("gil_balance");
+			ps3.setInt(1, otherBankAcc.getBankAccountId());		//refresh the bank instance in case changes were made(real world applicable)
+			double oldOtherBankAccbalance = 0;
+			ResultSet rs3 = ps3.executeQuery();
+			while(rs3.next()) {
+				oldOtherBankAccbalance = rs3.getDouble("gil_balance");
 			}
-			
-			double newToAccBalance = oldToAccBalance + transferAmount;//subtract from this account
-			
-			String sql4 = "Update bank_accounts set(gil_balance=(?) where bank_account.id = (?))";
+			double newOtherBankAccBalance = 0;
+			if(!(transferToThis)) {
+				newOtherBankAccBalance = oldOtherBankAccbalance + transferAmount;
+			}
+			else {
+				newOtherBankAccBalance = oldOtherBankAccbalance - transferAmount;
+				
+			}
+			String sql4 = "Update bank_accounts SET gil_balance = ?  where id = ? RETURNING *";
 			PreparedStatement ps4 = connection.prepareStatement(sql4);
-			ps4.setDouble(1, newToAccBalance);
-			ps4.setInt(2, bankAccSelectedDest.getBankAccountId());
-			ps4.executeUpdate(sql4);
+			ps4.setDouble(1, newOtherBankAccBalance);
+			ps4.setInt(2, otherBankAcc.getBankAccountId());
+			ResultSet rs4 = ps4.executeQuery();
 			
 			
-
+			System.out.println("Success bitch");
 			connection.commit();//end transaction
 		}
 		catch(SQLException e) {
@@ -137,14 +140,7 @@ public class BankAccountTransactionView implements View {//provides options for 
 		}
 		
 	}
-	private void transferFrom() {
-		System.out.println("Type the name of the account you wish to transfer funds from from the list below:\n");
-		//refresh the bank instance in case changes were made to balance since accessed through UserAccount view selection
-		System.out.println("Successfully altered balance");
-	}
 	
-	
-
 	private void deposit() {
 		//refresh the bank instance in case changes were made to balance since accessed through UserAccount view selection
 		System.out.println("Successfully altered balance");
@@ -153,19 +149,6 @@ public class BankAccountTransactionView implements View {//provides options for 
 		System.out.println("Choose a quantity to withdrawal, you may loan as much as you want, not exceeding -999999999.99 gil(pretty great huh)");
 		//refresh the bank instance in case changes were made to balance since accessed through UserAccount view selection
 		System.out.println("Successfully altered balance");
-	}
-	
-	
-	
-	private double alterBalance(BankAccount bankAccSelected, Double BalanceObtained){
-		double newBalance;
-		newBalance = bankAccSelected.getGilBalance(); 
-		
-		
-		System.out.println("Successfully altered balance");
-		return newBalance;
-		
-
 	}
 	
 

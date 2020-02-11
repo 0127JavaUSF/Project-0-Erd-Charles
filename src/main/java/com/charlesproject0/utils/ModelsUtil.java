@@ -12,7 +12,7 @@ import com.charlesproject0.utils.ConnectionUtil;
 import com.charlesproject0.views.BankAccountTransactionView;
 import com.charlesproject0.views.MainMenu;
 
-public class VerifyingAccountsTableUtil {
+public class ModelsUtil {
 	public static ArrayList<String> returnVisibleAccounts(String ... strings ) {//verifies that the account exists in db
 		ArrayList<String> results = new ArrayList<String>();
 		try(Connection connection = ConnectionUtil.getConnection()){
@@ -47,10 +47,10 @@ public class VerifyingAccountsTableUtil {
 		
 		ArrayList<BankAccount> dbrsList = new ArrayList<BankAccount>();
 		try(Connection connection = ConnectionUtil.getConnection()){
-			String sql = "SELECT bank_accounts.id, bank_account_name, account_type, gil_balance FROM accounts\r\n" + 
-					"INNER JOIN accounts_join ON accounts.id = accounts_join.id\r\n" + 
-					"INNER JOIN bank_accounts ON accounts_join.bank_accounts_id = bank_accounts.id\r\n" + 
-					"WHERE account_name = ? ";
+			String sql = "SELECT * FROM bank_accounts \r\n" + 
+					"					JOIN accounts_join ON accounts_join.bank_accounts_id = bank_accounts.id \r\n" + 
+					"					JOIN accounts ON accounts_join.accounts_id = accounts.id \r\n" + 
+					"					 WHERE account_name = ?";
 			PreparedStatement ps = connection.prepareStatement(sql);
 			ps.setString(1, usrAcc.getAccountName());
 			ResultSet rs = ps.executeQuery();
@@ -82,7 +82,8 @@ public class VerifyingAccountsTableUtil {
 		String choice;
 		boolean found = false;//not sure i even need this
 		BankAccount foundAcc = null;
-		System.out.println("Type the name of the account you wish to transfer funds to from the list below:\n");
+		System.out.println("Select a bank account from the list:\n");
+		ModelsUtil.printBankAccounts(bankAccounts);
 			do {
 				choice = InputUtil.getNextString();
 				for(BankAccount bAcc: bankAccounts) {
@@ -96,5 +97,12 @@ public class VerifyingAccountsTableUtil {
 			while (!(found));//while user doesn't select one of the listed accounts
 		return foundAcc;
 
+	}
+
+	public static void printBankAccounts(ArrayList<BankAccount> bankAccounts) {
+		for (BankAccount bAcc: bankAccounts) {
+			System.out.println(bAcc.getBankAccountName());
+		}
+		
 	}
 }

@@ -34,15 +34,19 @@ public class InputUtil {
 	}
 	
 	public static double getNextDouble() {
-		double transferAmount = 0;
+		double quantity = 0;
 
+			System.out.println("Enter an amount to transfer");
+			
 			while(!scanner.hasNextDouble()) {
 				scanner.nextLine();
 
 			}
+			quantity = scanner.nextInt();
+			scanner.nextLine();
 
 		
-		return transferAmount;
+		return quantity;
 		
 	}
 }

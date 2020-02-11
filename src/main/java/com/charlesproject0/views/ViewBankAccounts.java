@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.charlesproject0.models.Account;
 import com.charlesproject0.models.BankAccount;
 import com.charlesproject0.utils.InputUtil;
-import com.charlesproject0.utils.VerifyingAccountsTableUtil;
+import com.charlesproject0.utils.ModelsUtil;
 
 public class ViewBankAccounts implements View {
 	private ArrayList<BankAccount> bankAccounts;
@@ -13,6 +13,7 @@ public class ViewBankAccounts implements View {
 	
 	public ViewBankAccounts(Account usrAcc) {
 		this.usrAcc = usrAcc;
+		this.bankAccounts = ModelsUtil.returnBankAccounts(this.usrAcc);
 	}
 
 
@@ -32,10 +33,8 @@ public class ViewBankAccounts implements View {
 	@Override
 	public View selectOption() {
 		try{
-			this.setBankAccounts(VerifyingAccountsTableUtil.returnBankAccounts(this.getUsrAcc()));
-			for (BankAccount bAcc: this.bankAccounts) {
-				System.out.println(bAcc.getBankAccountName());
-			}
+			this.setBankAccounts(ModelsUtil.returnBankAccounts(this.getUsrAcc()));
+			ModelsUtil.printBankAccounts(this.bankAccounts);
 			
 		}
 		catch(NullPointerException e) {
@@ -43,7 +42,7 @@ public class ViewBankAccounts implements View {
 		}
 		BankAccount foundAcc = null;
 		if (!(this.getBankAccounts().isEmpty())) {
-			foundAcc = VerifyingAccountsTableUtil.verifyBankInList(this.bankAccounts);
+			foundAcc = ModelsUtil.verifyBankInList(this.bankAccounts);
 			return new BankAccountTransactionView(this.bankAccounts, foundAcc, this.usrAcc);//TODO return BankAccountOptions
 		}
 		else {
