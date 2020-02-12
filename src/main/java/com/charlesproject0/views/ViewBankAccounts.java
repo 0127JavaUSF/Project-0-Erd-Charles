@@ -25,7 +25,7 @@ public class ViewBankAccounts implements View {
 	}
 	@Override
 	public void showMenu() {
-		System.out.println("Type in the name of an existing account listed below to begin: \n");
+		System.out.println("Type in the name of an existing account listed below to begin: \n\n");
 
 
 	}
@@ -46,7 +46,8 @@ public class ViewBankAccounts implements View {
 			return new BankAccountTransactionView(this.bankAccounts, foundAcc, this.usrAcc);//TODO return BankAccountOptions
 		}
 		else {
-			return new MainMenu();
+			System.out.println("\nThere were no accounts found, returning you to User account view");
+			return new UserAccountView(usrAcc);
 		}
 		
 		

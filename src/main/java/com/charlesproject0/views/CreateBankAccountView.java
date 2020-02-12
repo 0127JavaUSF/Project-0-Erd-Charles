@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import com.charlesproject0.utils.ConnectionUtil;
 import com.charlesproject0.utils.InputUtil;
-import com.charlesproject0.utils.JointOrSingleEnum;
+
 import com.charlesproject0.utils.ModelsUtil;
 import com.charlesproject0.models.Account;
 import com.charlesproject0.models.BankAccount;
@@ -27,7 +27,7 @@ public class CreateBankAccountView implements View {
 	@Override
 	public View selectOption() {
 		
-		ArrayList<String> accsReq = new ArrayList<String>;
+		ArrayList<String> accsReq = new ArrayList<String>();
 		accsReq.add(this.usrAcc.getAccountName());//need to add at least this user regardless if join/single
 		
 		System.out.println("Please enter bank account name ");
@@ -61,7 +61,7 @@ public class CreateBankAccountView implements View {
 		}
 		ModelsUtil.createBankAccount(bankAccName, checkOrSavingsParameter, isJointAcc, accsReq);//sends bank account name, checking or savings, isJoint account, and accounts required for now...
 
-		System.out.println("Bank account created");
+		System.out.println("Bank account created, return to User account View");
 		return new UserAccountView(this.usrAcc);
 	}
 	

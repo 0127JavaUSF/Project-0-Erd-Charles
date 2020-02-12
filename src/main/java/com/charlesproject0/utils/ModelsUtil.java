@@ -47,10 +47,10 @@ public class ModelsUtil {//All in one dao with some other utilities, not best pr
 		
 		ArrayList<BankAccount> dbrsList = new ArrayList<BankAccount>();
 		try(Connection connection = ConnectionUtil.getConnection()){
-			String sql = "SELECT * FROM bank_accounts \r\n" + 
-					"					JOIN accounts_join ON accounts_join.bank_accounts_id = bank_accounts.id \r\n" + 
-					"					JOIN accounts ON accounts_join.accounts_id = accounts.id \r\n" + 
-					"					 WHERE account_name = ?";
+			String sql = "SELECT * FROM bank_accounts " + 
+					"					JOIN accounts_join ON accounts_join.bank_accounts_id = bank_accounts.id " + 
+					"					JOIN accounts ON accounts_join.accounts_id = accounts.id " + 
+					"					 WHERE account_name = ? and isActive = true";
 			PreparedStatement ps = connection.prepareStatement(sql);
 			ps.setString(1, usrAcc.getAccountName());
 			ResultSet rs = ps.executeQuery();
@@ -139,10 +139,12 @@ public class ModelsUtil {//All in one dao with some other utilities, not best pr
 			System.out.println("Amount was successfully issued for " + autoStatement);
 			return updatedAcc;
 	}
-	
+	//TODO finish this method for joint/single bank account creation
 	public static void createBankAccount(String bAccName, String checkOrSave, boolean jointAcc, ArrayList<String> usrAccs) {
 		try(Connection connection = ConnectionUtil.getConnection()){
-			connection.setAutoCommit(false);
+			connection.setAutoCommit(false);//start transaction takes 2-3 uqueries
+			
+	
 			String sql = "INSERT INTO bank_accounts" + 
 					" (bank_account_name, account_type, gil_balance) " + 
 					" VALUES(?, ?, 0.0) RETURNING * ";
@@ -151,54 +153,33 @@ public class ModelsUtil {//All in one dao with some other utilities, not best pr
 			ps.setString(1, bAccName);
 			ps.setString(2, checkOrSave);
 			
+			BankAccount tempBAcc = null;//used to create joins
+			
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()) {
-				BankAccount tempBAcc = new BankAccount(rs.getInt("id"), rs.getString("bank_account_name"), rs.getString("account_type"), rs.getDouble("gil_balance"));
+				tempBAcc = new BankAccount(rs.getInt("id"), rs.getString("bank_account_name"), rs.getString("account_type"), rs.getDouble("gil_balance"));
 			}
 			
 			
 	
 			
-			
-			String sql2 = "INSERT INTO accounts_join " + 
-					" (accounts_id, bank_accounts_id) " + 
-					" VALUES(?, ?); ";
-			PreparedStatement ps2 = connection.prepareStatement(sql);
-			
-			ps2.setInt(1, bAcc);
-			ps2.setInt(2, checkOrSave);
-			
-			ResultSet rs2 = ps.executeQuery();
-			
-			
-			
-			
-			
-			
-			if (jointAcc) {
+			for(String accAsString : usrAccs) {//iterates through each account as string to insert into join table
+				String sql2 = "INSERT INTO accounts_join " + 
+						"		(accounts_id, bank_accounts_id) " + 
+						"		VALUES((SELECT accounts.id FROM accounts where account_name = ? ), ?) RETURNING *; ";
+				PreparedStatement ps2 = connection.prepareStatement(sql2);
 				
+				ps2.setString(1, accAsString);
+				ps2.setInt(2, tempBAcc.getBankAccountId());
+				
+				ResultSet rs2 = ps2.executeQuery();
+				
+					
 			}
-			else {
+			
 				connection.commit();
-			}
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 			
 		
-			
-			
 		}
 		catch(SQLException e) {
 			e.printStackTrace();

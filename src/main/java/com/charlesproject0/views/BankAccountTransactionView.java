@@ -36,15 +36,16 @@ public class BankAccountTransactionView implements View {//provides options for 
 				"|'-.._           ''''':::..::':          __,,-\r\n" + 
 				" '-.._''`---.....______________.....---''__,,-\r\n" + 
 				"      ''`---.....______________.....---''");
-		System.out.println("1: Withdrawal");
-		System.out.println("2: Deposit");
-		System.out.println("3: Transfer to/from this account");
-		System.out.println("4: Return to viewing bank accounts");
+		System.out.println("1: Withdrawal/Deposit");
+		System.out.println("2: Transfer");
+		System.out.println("3: Delete this bank account(DANGEROUS)");
+		System.out.println("4: View Balance");
+		System.out.println("5: Return to User account view");
 	}
 
 	@Override
 	public View selectOption() {
-		int selection = InputUtil.getIntInRange(1, 3);
+		int selection = InputUtil.getIntInRange(1, 5);
 //		 User selects something - should be reusable
 //		 Do something with their selection, custom to this class
 		switch(selection) {
@@ -53,10 +54,16 @@ public class BankAccountTransactionView implements View {//provides options for 
 			return this;
 			case 2: transfer();
 			return this;
+			case 3: delete();
+			return new UserAccountView(this.usrAcc);//bank account is gone, so we need to return them to viewing bank accounts
+			case 4: viewBalance();
+			return this;
 			default: return new UserAccountView(this.usrAcc);
 		}
 
 	}
+
+
 	private void transfer() {
 		System.out.println("Select from the following options:");
 		System.out.println("1.Transfer to this bank account from another bank account");
@@ -140,14 +147,45 @@ public class BankAccountTransactionView implements View {//provides options for 
 
 		ModelsUtil.usrWithdrawOrDeposit(withdrawal, gilAmount, this.currBankAcc);
 	}
-
 	
-
 	
-//	private String viewBalance(BankAccount bAcc) {
-//		return bAcc.getGilBalance();
-//		
-//		
-//	}
+	private void delete() {
+		try(Connection connection = ConnectionUtil.getConnection()){
+			String sql = "UPDATE public.bank_accounts " + 
+					" SET isactive = false " + 
+					" WHERE id= ? ";
+			PreparedStatement ps = connection.prepareStatement(sql);
+			ps.setInt(1, this.currBankAcc.getBankAccountId());
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Successfully 'deleted' account" + currBankAcc.getBankAccountName());
+		System.out.println("Returning to bank account options view...");		
+		
+		
+	}
+	
+	private void viewBalance() {
+		//refresh if changes since last viewing
+		try(Connection connection = ConnectionUtil.getConnection()){
+			String sql = "select * from bank_accounts where id = ?";
+			PreparedStatement ps = connection.prepareStatement(sql);
+			ps.setInt(1, this.currBankAcc.getBankAccountId());
+			ResultSet rs = ps.executeQuery();
+			while(rs.next()) {
+				this.currBankAcc.setGilBalance(rs.getDouble("gil_balance"));
+			}
+			System.out.println("Account Balance for account: " + this.currBankAcc.getGilBalance() + "gil\n");
+			
+			
+			
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Balance for account: " + this.currBankAcc.getBankAccountName() + "is " + this.currBankAcc.getGilBalance() + "gil.");
+	}
+
 
 }
