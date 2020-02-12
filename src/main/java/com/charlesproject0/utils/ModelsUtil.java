@@ -139,4 +139,106 @@ public class ModelsUtil {//All in one dao with some other utilities, not best pr
 			System.out.println("Amount was successfully issued for " + autoStatement);
 			return updatedAcc;
 	}
+	
+	public static void createBankAccount(String bAccName, String checkOrSave, boolean jointAcc, ArrayList<String> usrAccs) {
+		try(Connection connection = ConnectionUtil.getConnection()){
+			connection.setAutoCommit(false);
+			String sql = "INSERT INTO bank_accounts" + 
+					" (bank_account_name, account_type, gil_balance) " + 
+					" VALUES(?, ?, 0.0) RETURNING * ";
+			PreparedStatement ps = connection.prepareStatement(sql);
+			
+			ps.setString(1, bAccName);
+			ps.setString(2, checkOrSave);
+			
+			ResultSet rs = ps.executeQuery();
+			while(rs.next()) {
+				BankAccount tempBAcc = new BankAccount(rs.getInt("id"), rs.getString("bank_account_name"), rs.getString("account_type"), rs.getDouble("gil_balance"));
+			}
+			
+			
+	
+			
+			
+			String sql2 = "INSERT INTO accounts_join " + 
+					" (accounts_id, bank_accounts_id) " + 
+					" VALUES(?, ?); ";
+			PreparedStatement ps2 = connection.prepareStatement(sql);
+			
+			ps2.setInt(1, bAcc);
+			ps2.setInt(2, checkOrSave);
+			
+			ResultSet rs2 = ps.executeQuery();
+			
+			
+			
+			
+			
+			
+			if (jointAcc) {
+				
+			}
+			else {
+				connection.commit();
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		
+			
+			
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+			System.out.println("There may be an issue with your database connection, please try again or contact admin");
+		}
+	}
+	
+	public static String verifyAccInList(String usrInputString) {
+
+		String foundName = null;
+		ArrayList<String> usrAccsAsStrings= ModelsUtil.returnAllAccountStrings();
+
+				for(String astring: usrAccsAsStrings) {
+					if (usrInputString.equals(astring)){
+
+						foundName = usrInputString;
+						return foundName;
+					};
+				}
+			System.out.println("\n\nUser Account not found...\n\n");
+			return foundName;
+	}
+
+	private static ArrayList<String> returnAllAccountStrings() {
+		ArrayList<String> usrAccsStrings = new ArrayList<String>();
+		try(Connection connection = ConnectionUtil.getConnection()){
+			String sql = "SELECT account_name FROM accounts";
+			PreparedStatement ps = connection.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery();
+			
+			
+			while (rs.next()) {//grabs all bank-accounts associated to the user account
+				usrAccsStrings.add(rs.getString("account_name"));
+				
+			}
+			
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return usrAccsStrings;
+	}
 }

@@ -37,7 +37,7 @@ public class DepositAndWithdrawalTests {
 	public void setUp() throws Exception {
 		unamePwd[0] = "Cloud";
 		unamePwd[1] = "Cloud123";
-		usrAcc = LoginView.loginAuth(unamePwd);
+//		usrAcc = LoginView.loginAuth(unamePwd);//must change loginview's method to public and static to run test 2
 		ArrayList<BankAccount> bankAccounts= ModelsUtil.returnBankAccounts(usrAcc);
 		theAccount = ModelsUtil.verifyBankInList(bankAccounts);
 		originalBalance = theAccount.getGilBalance();

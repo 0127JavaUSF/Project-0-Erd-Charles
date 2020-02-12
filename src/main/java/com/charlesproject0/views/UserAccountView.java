@@ -1,8 +1,11 @@
 package com.charlesproject0.views;
 
-import com.charlesproject0.models.Account;
+import java.util.ArrayList;
 
+import com.charlesproject0.models.Account;
+import com.charlesproject0.models.BankAccount;
 import com.charlesproject0.utils.InputUtil;
+import com.charlesproject0.utils.ModelsUtil;
 
 public class UserAccountView implements View {
 	Account usrAcc;
@@ -86,8 +89,18 @@ public class UserAccountView implements View {
 			// Do something with their selection, custom to this class
 			switch(selection) {
 
-				case 1: return new CreateBankAccountView();
-				case 2: return new ViewBankAccounts(this.getUsrAcc());
+				case 1: return new CreateBankAccountView(this.usrAcc);
+				case 2: 
+					ArrayList<BankAccount> bAccs = ModelsUtil.returnBankAccounts(this.usrAcc);
+					if (bAccs.isEmpty()) {
+						System.out.println("\n\nYou must create a bank account before being able to view one, "
+								+ "\nselect 'create bank account' option to create one\n\n");
+						return this;
+					}
+					else {
+						return new ViewBankAccounts(this.getUsrAcc());	
+					}
+
 				case 3: return new MainMenu() ;
 				default: return new MainMenu();
 			}
