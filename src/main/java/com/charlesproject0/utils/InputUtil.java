@@ -36,7 +36,7 @@ public class InputUtil {
 	public static double getNextDouble() {
 		double quantity = 0;
 
-			System.out.println("Enter an amount to transfer");
+			System.out.println("Enter an amount of gil to transfer");
 			
 			while(!scanner.hasNextDouble()) {
 				scanner.nextLine();

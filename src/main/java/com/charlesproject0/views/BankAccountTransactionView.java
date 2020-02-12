@@ -44,18 +44,16 @@ public class BankAccountTransactionView implements View {//provides options for 
 
 	@Override
 	public View selectOption() {
-		int selection = InputUtil.getIntInRange(1, 5);
+		int selection = InputUtil.getIntInRange(1, 3);
 //		 User selects something - should be reusable
 //		 Do something with their selection, custom to this class
 		switch(selection) {
 
-			case 1: withdrawal();
+			case 1: initWithDrawalOrDeposit();
 			return this;
-			case 2: deposit();
+			case 2: transfer();
 			return this;
-			case 3: transfer();
-			return this;
-			default: return new ViewBankAccounts(this.usrAcc);
+			default: return new UserAccountView(this.usrAcc);
 		}
 
 	}
@@ -115,7 +113,7 @@ public class BankAccountTransactionView implements View {//provides options for 
 			ResultSet rs4 = ps4.executeQuery();
 			
 			
-			System.out.println("Success bitch");
+			System.out.println("Successfully completed transfer");
 			connection.commit();//end transaction
 		}
 		catch(SQLException e) {
@@ -128,15 +126,21 @@ public class BankAccountTransactionView implements View {//provides options for 
 		
 	}
 	
-	private void deposit() {
-		//refresh the bank instance in case changes were made to balance since accessed through UserAccount view selection
-		System.out.println("Successfully altered balance");
+	private void initWithDrawalOrDeposit() {
+		
+		double gilAmount = InputUtil.getNextDouble();//obtain input for gil amount to withdraw/deposit
+		System.out.println("Choose from an option below:");
+		System.out.println("1:Withdrawal");
+		System.out.println("2:Deposit");
+		int choice = InputUtil.getIntInRange(1, 2);
+		boolean withdrawal = false;
+		if(choice == 1) {
+			withdrawal = true;
+		}
+
+		ModelsUtil.usrWithdrawOrDeposit(withdrawal, gilAmount, this.currBankAcc);
 	}
-	private void withdrawal() {
-		System.out.println("Choose a quantity to withdrawal, you may loan as much as you want, not exceeding -999999999.99 gil(pretty great huh)");
-		//refresh the bank instance in case changes were made to balance since accessed through UserAccount view selection
-		System.out.println("Successfully altered balance");
-	}
+
 	
 
 	

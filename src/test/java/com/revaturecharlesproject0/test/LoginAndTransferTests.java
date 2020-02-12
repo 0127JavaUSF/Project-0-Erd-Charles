@@ -48,7 +48,7 @@ public class LoginAndTransferTests {
 //		assertEquals("Should return accountView if provided cloud, cloud123 un/pwd combo(placeholder for auth); otherwise, fail", accView.getClass() , loginView.selectOption().getClass());
 //
 //	}
-	
+//	
 //	@Test
 //	public void testLoginUserAuth() {
 //		assertEquals("Should return the id of 1 associated to the value of the user returned from db", cloudAcc.getId() , loginView.loginAuth(loginCredench).getId());

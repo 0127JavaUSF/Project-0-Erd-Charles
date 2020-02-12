@@ -89,7 +89,7 @@ public class LoginView implements View {
 	}
 	
 	//switch to public during testing
-	private Account loginAuth(String[] uname_pwd) {
+	public static Account loginAuth(String[] uname_pwd) {//TODO switch back to private non-static after test
 		
 		Account usrAcc = null;
 		ResultSet rs = null;

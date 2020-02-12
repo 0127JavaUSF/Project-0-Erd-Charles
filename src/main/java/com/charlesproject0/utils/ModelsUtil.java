@@ -12,7 +12,7 @@ import com.charlesproject0.utils.ConnectionUtil;
 import com.charlesproject0.views.BankAccountTransactionView;
 import com.charlesproject0.views.MainMenu;
 
-public class ModelsUtil {
+public class ModelsUtil {//All in one dao with some other utilities, not best practice I know guys...
 	public static ArrayList<String> returnVisibleAccounts(String ... strings ) {//verifies that the account exists in db
 		ArrayList<String> results = new ArrayList<String>();
 		try(Connection connection = ConnectionUtil.getConnection()){
@@ -104,5 +104,39 @@ public class ModelsUtil {
 			System.out.println(bAcc.getBankAccountName());
 		}
 		
+	}
+	
+	public static BankAccount usrWithdrawOrDeposit(boolean withdrawal, double gilAmount, BankAccount bankAcc) {//allows a logged in user to make deposit/withdrawal
+			BankAccount updatedAcc = null;
+			try(Connection connection = ConnectionUtil.getConnection()){
+
+				//Account1 update
+				double currBankAccBalance = bankAcc.getGilBalance();
+				String sql2 = "Update bank_accounts SET gil_balance = ?  where id = ? and gil_balance = ? RETURNING *";
+				PreparedStatement ps2 = connection.prepareStatement(sql2);
+				double newCurrAccBalance = 0;
+				if (withdrawal) {
+				newCurrAccBalance = currBankAccBalance - gilAmount;//subtract from this account
+				}
+				else {
+				newCurrAccBalance = currBankAccBalance + gilAmount;
+				}
+				ps2.setDouble(1, newCurrAccBalance);
+				ps2.setInt(2, bankAcc.getBankAccountId());
+				ps2.setDouble(3, currBankAccBalance);
+				ResultSet rs2 = ps2.executeQuery();
+				while(rs2.next()) {
+					updatedAcc = new BankAccount(rs2.getInt("id"), rs2.getString("bank_account_name"), rs2.getString("account_type"), rs2.getDouble("gil_balance"));
+				}
+				
+			
+			}
+			catch(SQLException e) {
+				System.out.println("Something went wrong with the withdrawal/deposit");
+				e.printStackTrace();
+			}
+			String autoStatement = withdrawal ? "withdrawal" : "deposit";
+			System.out.println("Amount was successfully issued for " + autoStatement);
+			return updatedAcc;
 	}
 }
