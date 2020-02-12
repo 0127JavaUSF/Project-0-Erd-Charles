@@ -49,4 +49,10 @@ public class InputUtil {
 		return quantity;
 		
 	}
+	
+	public static void Read()
+	{
+	     System.out.print("Press any key to continue . . . ");
+	     scanner.nextLine();
+	}
 }

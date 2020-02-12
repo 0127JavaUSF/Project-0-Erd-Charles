@@ -81,55 +81,62 @@ public class BankAccountTransactionView implements View {//provides options for 
 
 		double transferAmount = InputUtil.getNextDouble();//obtain input for transfer amount
 		BankAccount otherBankAcc = ModelsUtil.verifyBankInList(bankAccounts);//allows user to select account from list
-		
-		try(Connection connection = ConnectionUtil.getConnection()){
+		if (!(otherBankAcc.getBankAccountName().equals(this.currBankAcc.getBankAccountName()))){
+			try(Connection connection = ConnectionUtil.getConnection()){
 
-			connection.setAutoCommit(false);//starts transaction
-			//Account1 update
-			double currBankAccBalance = this.currBankAcc.getGilBalance();
-			String sql2 = "Update bank_accounts SET gil_balance = ?  where id = ? and gil_balance = ? RETURNING *";
-			PreparedStatement ps2 = connection.prepareStatement(sql2);
-			double newCurrAccBalance = 0;
-			if (!(transferToThis)) {
-			newCurrAccBalance = currBankAccBalance - transferAmount;//subtract from this account
-			}
-			else {
-			newCurrAccBalance = currBankAccBalance + transferAmount;
-			}
-			ps2.setDouble(1, newCurrAccBalance);
-			ps2.setInt(2, this.currBankAcc.getBankAccountId());
-			ps2.setDouble(3, currBankAccBalance);
-			ResultSet rs2 = ps2.executeQuery();
-			
-			
-
-			double oldOtherBankAccBalance = otherBankAcc.getGilBalance();
-			String sql4 = "Update bank_accounts SET gil_balance = ?  where id = ? and gil_balance = ? RETURNING *";
-			PreparedStatement ps4 = connection.prepareStatement(sql4);
-			double newOtherBankAccBalance = 0;
-			if(!(transferToThis)) {
-				newOtherBankAccBalance = oldOtherBankAccBalance + transferAmount;
-			}
-			else {
-				newOtherBankAccBalance = oldOtherBankAccBalance - transferAmount;
+				connection.setAutoCommit(false);//starts transaction
+				//Account1 update
+				double currBankAccBalance = this.currBankAcc.getGilBalance();
+				String sql2 = "Update bank_accounts SET gil_balance = ?  where id = ? and gil_balance = ? RETURNING *";
+				PreparedStatement ps2 = connection.prepareStatement(sql2);
+				double newCurrAccBalance = 0;
+				if (!(transferToThis)) {
+				newCurrAccBalance = currBankAccBalance - transferAmount;//subtract from this account
+				}
+				else {
+				newCurrAccBalance = currBankAccBalance + transferAmount;
+				}
+				ps2.setDouble(1, newCurrAccBalance);
+				ps2.setInt(2, this.currBankAcc.getBankAccountId());
+				ps2.setDouble(3, currBankAccBalance);
+				ResultSet rs2 = ps2.executeQuery();
 				
+				
+
+				double oldOtherBankAccBalance = otherBankAcc.getGilBalance();
+				String sql4 = "Update bank_accounts SET gil_balance = ?  where id = ? and gil_balance = ? RETURNING *";
+				PreparedStatement ps4 = connection.prepareStatement(sql4);
+				double newOtherBankAccBalance = 0;
+				if(!(transferToThis)) {
+					newOtherBankAccBalance = oldOtherBankAccBalance + transferAmount;
+				}
+				else {
+					newOtherBankAccBalance = oldOtherBankAccBalance - transferAmount;
+					
+				}
+				ps4.setDouble(1, newOtherBankAccBalance);
+				ps4.setInt(2, otherBankAcc.getBankAccountId());
+				ps4.setDouble(3, oldOtherBankAccBalance);
+				ResultSet rs4 = ps4.executeQuery();
+				
+				
+				System.out.println("Successfully completed transfer");
+				connection.commit();//end transaction
+				InputUtil.Read();
 			}
-			ps4.setDouble(1, newOtherBankAccBalance);
-			ps4.setInt(2, otherBankAcc.getBankAccountId());
-			ps4.setDouble(3, oldOtherBankAccBalance);
-			ResultSet rs4 = ps4.executeQuery();
-			
-			
-			System.out.println("Successfully completed transfer");
-			connection.commit();//end transaction
+			catch(SQLException e) {
+				e.printStackTrace();
+				System.out.println("Transaction declined");
+			}
+			catch(Exception e) {//remove me once done debugging
+				e.printStackTrace();
+			}
 		}
-		catch(SQLException e) {
-			e.printStackTrace();
-			System.out.println("Transaction declined");
+		else{
+			System.out.println("You may not transfer from the same account to the same account");
+			InputUtil.Read();
 		}
-		catch(Exception e) {//remove me once done debugging
-			e.printStackTrace();
-		}
+
 		
 	}
 	
@@ -146,6 +153,7 @@ public class BankAccountTransactionView implements View {//provides options for 
 		}
 
 		ModelsUtil.usrWithdrawOrDeposit(withdrawal, gilAmount, this.currBankAcc);
+		InputUtil.Read();
 	}
 	
 	
@@ -153,15 +161,16 @@ public class BankAccountTransactionView implements View {//provides options for 
 		try(Connection connection = ConnectionUtil.getConnection()){
 			String sql = "UPDATE public.bank_accounts " + 
 					" SET isactive = false " + 
-					" WHERE id= ? ";
+					" WHERE id= ? returning *";
 			PreparedStatement ps = connection.prepareStatement(sql);
 			ps.setInt(1, this.currBankAcc.getBankAccountId());
+			ResultSet rs = ps.executeQuery();
 		}
 		catch(SQLException e) {
 			e.printStackTrace();
 		}
 		System.out.println("Successfully 'deleted' account" + currBankAcc.getBankAccountName());
-		System.out.println("Returning to bank account options view...");		
+		InputUtil.Read();
 		
 		
 	}
@@ -185,6 +194,7 @@ public class BankAccountTransactionView implements View {//provides options for 
 			e.printStackTrace();
 		}
 		System.out.println("Balance for account: " + this.currBankAcc.getBankAccountName() + "is " + this.currBankAcc.getGilBalance() + "gil.");
+		InputUtil.Read();
 	}
 
 

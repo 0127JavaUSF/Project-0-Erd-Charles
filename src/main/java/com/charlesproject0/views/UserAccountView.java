@@ -133,26 +133,26 @@ public class UserAccountView implements View {
 	@Override
 	public View selectOption() {
 		
-			int selection = InputUtil.getIntInRange(1, 3);
-			// User selects something - should be reusable
-			// Do something with their selection, custom to this class
-			switch(selection) {
+		int selection = InputUtil.getIntInRange(1, 3);
+		// User selects something - should be reusable
+		// Do something with their selection, custom to this class
+		switch(selection) {
 
-				case 1: return new CreateBankAccountView(this.usrAcc);
-				case 2: 
-					ArrayList<BankAccount> bAccs = ModelsUtil.returnBankAccounts(this.usrAcc);
-					if (bAccs.isEmpty()) {
-						System.out.println("\n\nYou must create a bank account before being able to view one, "
-								+ "\nselect 'create bank account' option to create one\n\n");
-						return this;
-					}
-					else {
-						return new ViewBankAccounts(this.getUsrAcc());	
-					}
+			case 1: return new CreateBankAccountView(this.usrAcc);//allows user to create joint/single accounts
+			case 2: 
+				ArrayList<BankAccount> bAccs = ModelsUtil.returnBankAccounts(this.usrAcc);
+				if (bAccs.isEmpty()) {
+					System.out.println("\n\nYou must create a bank account before being able to view one, "
+							+ "\nselect 'create bank account' option to create one\n\n");
+					return this;
+				}
+				else {
+					return new ViewBankAccounts(this.getUsrAcc());	
+				}
 
-				case 3: return new MainMenu() ;
-				default: return new MainMenu();
-			}
+			case 3: return new MainMenu() ;
+			default: return new MainMenu();
+		}
 	}
 		
 		
