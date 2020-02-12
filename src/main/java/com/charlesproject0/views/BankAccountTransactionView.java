@@ -81,15 +81,8 @@ public class BankAccountTransactionView implements View {//provides options for 
 
 			connection.setAutoCommit(false);//starts transaction
 			//Account1 update
-			String sql = "select gil_balance from bank_accounts where id = ?";
-			PreparedStatement ps = connection.prepareStatement(sql);
-			ps.setInt(1, this.currBankAcc.getBankAccountId());		//refresh the bank instance in case changes were made(real world applicable)
-			ResultSet rs = ps.executeQuery();
-			double currBankAccBalance = 0;
-			while(rs.next()) {
-				currBankAccBalance = rs.getDouble("gil_balance");
-			}
-			String sql2 = "Update bank_accounts SET gil_balance = ?  where id = ? RETURNING *";
+			double currBankAccBalance = this.currBankAcc.getGilBalance();
+			String sql2 = "Update bank_accounts SET gil_balance = ?  where id = ? and gil_balance = ? RETURNING *";
 			PreparedStatement ps2 = connection.prepareStatement(sql2);
 			double newCurrAccBalance = 0;
 			if (!(transferToThis)) {
@@ -100,31 +93,25 @@ public class BankAccountTransactionView implements View {//provides options for 
 			}
 			ps2.setDouble(1, newCurrAccBalance);
 			ps2.setInt(2, this.currBankAcc.getBankAccountId());
+			ps2.setDouble(3, currBankAccBalance);
 			ResultSet rs2 = ps2.executeQuery();
 			
 			
-			
-			//Account2 update
-			String sql3 = "select gil_balance from bank_accounts where id = ?";
-			PreparedStatement ps3 = connection.prepareStatement(sql3);
-			ps3.setInt(1, otherBankAcc.getBankAccountId());		//refresh the bank instance in case changes were made(real world applicable)
-			double oldOtherBankAccbalance = 0;
-			ResultSet rs3 = ps3.executeQuery();
-			while(rs3.next()) {
-				oldOtherBankAccbalance = rs3.getDouble("gil_balance");
-			}
+
+			double oldOtherBankAccBalance = otherBankAcc.getGilBalance();
+			String sql4 = "Update bank_accounts SET gil_balance = ?  where id = ? and gil_balance = ? RETURNING *";
+			PreparedStatement ps4 = connection.prepareStatement(sql4);
 			double newOtherBankAccBalance = 0;
 			if(!(transferToThis)) {
-				newOtherBankAccBalance = oldOtherBankAccbalance + transferAmount;
+				newOtherBankAccBalance = oldOtherBankAccBalance + transferAmount;
 			}
 			else {
-				newOtherBankAccBalance = oldOtherBankAccbalance - transferAmount;
+				newOtherBankAccBalance = oldOtherBankAccBalance - transferAmount;
 				
 			}
-			String sql4 = "Update bank_accounts SET gil_balance = ?  where id = ? RETURNING *";
-			PreparedStatement ps4 = connection.prepareStatement(sql4);
 			ps4.setDouble(1, newOtherBankAccBalance);
 			ps4.setInt(2, otherBankAcc.getBankAccountId());
+			ps4.setDouble(3, oldOtherBankAccBalance);
 			ResultSet rs4 = ps4.executeQuery();
 			
 			
