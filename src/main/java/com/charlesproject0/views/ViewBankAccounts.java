@@ -25,7 +25,7 @@ public class ViewBankAccounts implements View {
 	}
 	@Override
 	public void showMenu() {
-		System.out.println("Type in the name of an existing account listed below to begin: \n\n");
+	
 
 
 	}
@@ -34,7 +34,7 @@ public class ViewBankAccounts implements View {
 	public View selectOption() {
 		try{
 			this.setBankAccounts(ModelsUtil.returnBankAccounts(this.getUsrAcc()));
-			ModelsUtil.printBankAccounts(this.bankAccounts);
+//			ModelsUtil.printBankAccounts(this.bankAccounts);
 			
 		}
 		catch(NullPointerException e) {
