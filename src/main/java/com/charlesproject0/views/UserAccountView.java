@@ -74,6 +74,7 @@ public class UserAccountView implements View {
 "                  H;H\r\n" + 
 "                  HH\r\n" + 
 "                  H\n\n\n");
+		InputUtil.Read();
 
 		}
 		else if(usrAcc.getAccountName().contentEquals("Sephiroth")) {
@@ -116,7 +117,7 @@ public class UserAccountView implements View {
 					"                                                @%@@@@@                         \r\n" + 
 					"                                                  %@&#@@@&.   ");
 			
-			
+			InputUtil.Read();
 		}
 		
 		

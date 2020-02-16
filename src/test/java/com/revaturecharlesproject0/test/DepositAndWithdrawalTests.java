@@ -52,7 +52,7 @@ public class DepositAndWithdrawalTests {
 	}
 
 //	@Test
-//	public void testBankWithdrawal() {//must set method to public static due to not following best practices
+//	public void testBankWithdrawal() {//must set method to public static
 //		
 //		
 //		assertEquals("New balance should be old balance minus requested ", originalBalance - requestedAmount,  updatedAcc.getGilBalance(), 0.00);
